@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 
 const app = express();
+app.set("trust proxy", 1);
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({ 
@@ -11,10 +12,14 @@ app.use(cors({
   credentials: true               
 }));
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 const ACCESS_SECRET = "access_token_secret_key_123";
 const REFRESH_SECRET = "refresh_token_secret_key_456";
+
+app.get('/', (req, res) => {
+  res.json({ message: "API is running successfully" });
+});
 
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
@@ -25,10 +30,12 @@ app.post('/api/login', (req, res) => {
     const accessToken = jwt.sign(user, ACCESS_SECRET, { expiresIn: '10m' });
     const refreshToken = jwt.sign(user, REFRESH_SECRET, { expiresIn: '7d' });
 
+    const isSecure = req.secure || req.headers['x-forwarded-proto'] === 'https';
+
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: false, 
-      sameSite: 'lax',
+      secure: isSecure, 
+      sameSite: isSecure ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000 
     });
 
@@ -72,4 +79,8 @@ app.get('/api/dashboard-data', verifyAccessToken, (req, res) => {
   res.json({ message: "Welcome!", user: req.user });
 });
 
-app.listen(PORT, () => console.log(`Backend server running on port ${PORT}`));
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => console.log(`Backend server running on port ${PORT}`));
+}
+
+export default app;

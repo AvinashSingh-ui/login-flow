@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://login-flow-1.onrender.com/api';
+
 const axiosClient = axios.create({
-  baseURL: 'http://localhost:3000/api',
+  baseURL: API_BASE_URL,
   withCredentials: true,
 });
 
@@ -24,7 +26,7 @@ axiosClient.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const res = await axios.post('http://localhost:3000/api/refresh', {}, {
+        const res = await axios.post(`${API_BASE_URL}/refresh`, {}, {
           withCredentials: true
         });
 

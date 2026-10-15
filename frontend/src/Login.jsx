@@ -28,7 +28,7 @@ export default function Login() {
       if (err.response?.data?.message) {
         setError(err.response.data.message);
       } else if (err.code === 'ERR_NETWORK' || !err.response) {
-        setError('Cannot connect to server. Please ensure the backend is running on port 3000.');
+        setError('Cannot connect to server. Please ensure the backend is reachable.');
       } else {
         setError(err.message || 'Login failed. Please try again.');
       }

@@ -53,4 +53,7 @@ test('user can log in and log out', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Logout' }).click();
 
+  await expect(
+    page.getByRole('textbox', { name: 'Email address' })
+  ).toBeVisible();
 });
